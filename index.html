@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Acquos - EV Investment Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Login Page - Full Screen, First Thing Users See */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 2000;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 40px;
+            padding: 50px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card h1 {
+            font-size: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Main App - Hidden until logged in */
+        .app-container {
+            display: none;
+            max-width: 500px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px 20px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .welcome-text {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .user-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            flex: 1;
+            padding: 18px;
+            border-radius: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card:active {
+            transform: scale(0.95);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 14px;
+            text-align: center;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Section Title */
+        .section-title {
+            padding: 20px 20px 10px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Product Cards */
+        .product-card {
+            background: white;
+            margin: 15px 20px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            color: #1a1a2e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .product-card:active {
+            transform: scale(0.98);
+        }
+
+        .product-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .product-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #10b981;
+            margin: 15px 0;
+        }
+
+        .product-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .product-info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .buy-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 25px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .buy-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* VIP Badge */
+        .vip-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        /* Team Section */
+        .team-levels {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            flex: 1;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .level-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .level-percent {
+            font-size: 14px;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .invite-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            margin: 20px;
+            padding: 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .invite-code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 15px;
+            font-family: monospace;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Service Items */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 0 20px;
+        }
+
+        .service-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .service-item:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .service-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .service-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 25px 25px 0 0;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            border-radius: 15px;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            padding-bottom: 20px;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            color: #1a1a2e;
+        }
+
+        .payment-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 20px;
+            margin: 15px 0;
+        }
+
+        .close-modal {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            color: #999;
+        }
+
+        .amount-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .amount-btn:active {
+            background: #667eea;
+            color: white;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            z-index: 3500;
+            animation: fadeInOut 2s ease;
+            font-weight: 500;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN PAGE - First thing users see -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <h1>ACQUOS</h1>
+            <div class="input-group">
+                <input type="tel" id="phone" placeholder="Phone number">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <button class="login-btn" onclick="login()">Log in</button>
+            <div class="register-link" onclick="showRegister()">Go to register →</div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeRegisterModal()">&times;</span>
+            <h2 style="margin-bottom: 20px;">Create Account</h2>
+            <input type="tel" id="regPhone" placeholder="Phone number" required>
+            <input type="password" id="regPassword" placeholder="Password (min 6 characters)" required>
+            <input type="text" id="inviteCode" placeholder="Invite code (optional)">
+            <button class="buy-btn" onclick="register()">Register</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP - Hidden until login -->
+    <div id="appContainer" class="app-container">
+        <div class="header">
+            <div class="welcome-text">Welcome back,</div>
+            <div class="user-name" id="userPhone">Member</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-card" onclick="showPage('recharge')">
+                <div class="stat-label">💰 Balance</div>
+                <div class="stat-value" id="balance">RWF 0</div>
+            </div>
+            <div class="stat-card" onclick="showPage('records')">
+                <div class="stat-label">📈 Total Income</div>
+                <div class="stat-value" id="cumulativeIncome">RWF 0</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-btn" onclick="showPage('recharge')">💸 Recharge</div>
+            <div class="action-btn" onclick="showPage('withdraw')">💳 Withdraw</div>
+            <div class="action-btn" onclick="showPage('records')">📋 Records</div>
+            <div class="action-btn" onclick="checkIn()">✅ Check in</div>
+        </div>
+
+        <!-- HOME PAGE -->
+        <div id="homePage" class="page active-page">
+            <div class="section-title">
+                <span>🏠 Dashboard</span>
+            </div>
+            <div class="invite-box" style="text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 10px;">⚡</div>
+                <div style="font-size: 18px; font-weight: bold;">Welcome to Acquos</div>
+                <div style="font-size: 12px; margin-top: 10px; opacity: 0.8;">Invest in EV charging and earn daily returns</div>
+            </div>
+            <div class="invite-box">
+                <div style="font-weight: bold; margin-bottom: 10px;">📊 Quick Stats</div>
+                <div class="product-info-row" style="color: white;">
+                    <span>Active Investments:</span>
+                    <span id="activeInvestments">0</span>
+                </div>
+                <div class="product-info-row" style="color: white;">
+                    <span>Team Members:</span>
+                    <span id="teamCount">0</span>
+                </div>
+                <div class="product-info-row" style="color: white;">
+                    <span>Today's Income:</span>
+                    <span id="todayIncome">RWF 0</span>
+                </div>
+            </div>
+            <div class="invite-box">
+                <div style="font-weight: bold; margin-bottom: 10px;">🎯 How it Works</div>
+                <div style="font-size: 13px; line-height: 1.8;">
+                    1️⃣ Recharge your wallet<br>
+                    2️⃣ Choose an investment plan<br>
+                    3️⃣ Earn daily income for 150 days<br>
+                    4️⃣ Invite friends for 36% commission
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUCT PAGE -->
+        <div id="productPage" class="page">
+            <div class="section-title">
+                <span>⚡ Investment Plans</span>
+            </div>
+
+            <div class="product-card">
+                <div class="vip-badge">⭐ VIP1</div>
+                <div class="product-title">Autel MaxiCharger A</div>
+                <div class="product-price">RWF 6,000</div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📅 Term</span>
+                    <span class="product-info-value">150 days</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">💰 Daily income</span>
+                    <span class="product-info-value" style="color: #10b981;">RWF 1,200</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📈 Total income</span>
+                    <span class="product-info-value" style="color: #667eea;">RWF 180,000</span>
+                </div>
+                <button class="buy-btn" onclick="buyProduct('VIP1 Autel MaxiCharger A', 6000, 1200)">⚡ BUY NOW</button>
+            </div>
+
+            <div class="product-card">
+                <div class="vip-badge">⭐ VIP2</div>
+                <div class="product-title">Autel MaxiCharger B</div>
+                <div class="product-price">RWF 12,000</div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📅 Term</span>
+                    <span class="product-info-value">150 days</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">💰 Daily income</span>
+                    <span class="product-info-value" style="color: #10b981;">RWF 2,520</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📈 Total income</span>
+                    <span class="product-info-value" style="color: #667eea;">RWF 378,000</span>
+                </div>
+                <button class="buy-btn" onclick="buyProduct('VIP2 Autel MaxiCharger B', 12000, 2520)">⚡ BUY NOW</button>
+            </div>
+
+            <div class="product-card">
+                <div class="vip-badge">⭐ VIP3</div>
+                <div class="product-title">Autel MaxiCharger C</div>
+                <div class="product-price">RWF 24,000</div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📅 Term</span>
+                    <span class="product-info-value">150 days</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">💰 Daily income</span>
+                    <span class="product-info-value" style="color: #10b981;">RWF 5,280</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📈 Total income</span>
+                    <span class="product-info-value" style="color: #667eea;">RWF 792,000</span>
+                </div>
+                <button class="buy-btn" onclick="buyProduct('VIP3 Autel MaxiCharger C', 24000, 5280)">⚡ BUY NOW</button>
+            </div>
+
+            <div class="product-card">
+                <div class="vip-badge">⭐ VIP4</div>
+                <div class="product-title">Autel MaxiCharger D</div>
+                <div class="product-price">RWF 48,000</div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📅 Term</span>
+                    <span class="product-info-value">150 days</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">💰 Daily income</span>
+                    <span class="product-info-value" style="color: #10b981;">RWF 11,040</span>
+                </div>
+                <div class="product-info-row">
+                    <span class="product-info-label">📈 Total income</span>
+                    <span class="product-info-value" style="color: #667eea;">RWF 1,656,000</span>
+                </div>
+                <button class="buy-btn" onclick="buyProduct('VIP4 Autel MaxiCharger D', 48000, 11040)">⚡ BUY NOW</button>
+            </div>
+        </div>
+
+        <!-- TEAM PAGE -->
+        <div id="teamPage" class="page">
+            <div class="section-title">
+                <span>👥 My Team</span>
+            </div>
+            
+            <div class="team-levels" id="teamLevels">
+                <div class="level-card">
+                    <div class="level-name">Lv1</div>
+                    <div class="level-percent">36%</div>
+                    <div id="lv1Users">0 users</div>
+                </div>
+                <div class="level-card">
+                    <div class="level-name">Lv2</div>
+                    <div class="level-percent">1%</div>
+                    <div id="lv2Users">0 users</div>
+                </div>
+                <div class="level-card">
+                    <div class="level-name">Lv3</div>
+                    <div class="level-percent">1%</div>
+                    <div id="lv3Users">0 users</div>
+                </div>
+            </div>
+
+            <div class="invite-box">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 15px;">🚀 Invite Friends</div>
+                <div>Share invitation code or link</div>
+                <div class="invite-code">
+                    <span id="inviteCodeDisplay">Loading...</span>
+                    <button class="copy-btn" onclick="copyCode()">Copy</button>
+                </div>
+                <div class="invite-code">
+                    <span id="inviteLink" style="font-size: 12px;">Loading...</span>
+                    <button class="copy-btn" onclick="copyLink()">Copy</button>
+                </div>
+            </div>
+
+            <div class="invite-box">
+                <div style="font-weight: bold; margin-bottom: 10px;">💰 Commission Structure</div>
+                <div style="font-size: 13px; line-height: 1.8;">
+                    • Level 1: <strong style="color: #ffd700;">36%</strong> on direct referrals<br>
+                    • Level 2: <strong style="color: #ffd700;">1%</strong> on second-level referrals<br>
+                    • Level 3: <strong style="color: #ffd700;">1%</strong> on third-level referrals<br>
+                    • Commissions credited instantly to balance
+                </div>
+            </div>
+        </div>
+
+        <!-- RECHARGE PAGE -->
+        <div id="rechargePage" class="page">
+            <div class="section-title">
+                <span>💰 Recharge</span>
+            </div>
+            <div class="product-card" style="background: white; color: #1a1a2e;">
+                <div style="font-weight: bold; margin-bottom: 15px;">Select Amount (RWF)</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                    <button class="amount-btn" onclick="setAmount(6000)">6,000</button>
+                    <button class="amount-btn" onclick="setAmount(12000)">12,000</button>
+                    <button class="amount-btn" onclick="setAmount(24000)">24,000</button>
+                    <button class="amount-btn" onclick="setAmount(48000)">48,000</button>
+                    <button class="amount-btn" onclick="setAmount(100000)">100k</button>
+                    <button class="amount-btn" onclick="setAmount(250000)">250k</button>
+                    <button class="amount-btn" onclick="setAmount(450000)">450k</button>
+                    <button class="amount-btn" onclick="setAmount(950000)">950k</button>
+                </div>
+                <input type="number" id="rechargeAmount" placeholder="Or enter custom amount">
+                <select id="paymentMethod">
+                    <option value="mtn">MTN Mobile Money</option>
+                    <option value="airtel">Airtel Money</option>
+                    <option value="bank">Bank Transfer</option>
+                </select>
+                <button class="buy-btn" onclick="proceedToPayment()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- WITHDRAW PAGE -->
+        <div id="withdrawPage" class="page">
+            <div class="section-title">
+                <span>💳 Withdraw</span>
+            </div>
+            <div class="product-card" style="background: white; color: #1a1a2e;">
+                <input type="number" id="withdrawAmount" placeholder="Enter amount (RWF)">
+                <div class="product-info-row">
+                    <span>Available balance:</span>
+                    <span id="availableBalance" style="font-weight: bold; color: #10b981;">RWF 0</span>
+                </div>
+                <button class="buy-btn" onclick="withdraw()">Request Withdrawal</button>
+                <div style="font-size: 12px; color: #666; margin-top: 15px; text-align: center;">
+                    Min: 1,000 RWF • Processing: 2-24 hours
+                </div>
+            </div>
+        </div>
+
+        <!-- RECORDS PAGE -->
+        <div id="recordsPage" class="page">
+            <div class="section-title">
+                <span>📋 Transaction History</span>
+            </div>
+            <div id="recordsList"></div>
+        </div>
+
+        <!-- MINE PAGE -->
+        <div id="minePage" class="page">
+            <div class="section-title">
+                <span>👤 My Account</span>
+            </div>
+            
+            <div class="invite-box">
+                <div class="product-info-row" style="color: white;">
+                    <span>📞 Phone:</span>
+                    <span id="profilePhone">-</span>
+                </div>
+                <div class="product-info-row" style="color: white;">
+                    <span>🔑 Invite Code:</span>
+                    <span id="profileInviteCode">-</span>
+                </div>
+                <div class="product-info-row" style="color: white;">
+                    <span>📅 Joined:</span>
+                    <span id="profileJoined">-</span>
+                </div>
+            </div>
+
+            <div class="section-title" style="padding-top: 10px;">
+                <span>🛎️ My Services</span>
+            </div>
+            <div class="service-grid">
+                <div class="service-item" onclick="showToast('📖 About Us - Coming Soon')">
+                    <div class="service-icon">📖</div>
+                    <div class="service-name">About us</div>
+                </div>
+                <div class="service-item" onclick="showToast('📜 Regulation - Coming Soon')">
+                    <div class="service-icon">📜</div>
+                    <div class="service-name">Regulation</div>
+                </div>
+                <div class="service-item" onclick="showPage('records')">
+                    <div class="service-icon">📊</div>
+                    <div class="service-name">Records</div>
+                </div>
+                <div class="service-item" onclick="showToast('💬 Customer Service - Coming Soon')">
+                    <div class="service-icon">💬</div>
+                    <div class="service-name">Customer Service</div>
+                </div>
+                <div class="service-item" onclick="showToast('📤 Share Submit - Coming Soon')">
+                    <div class="service-icon">📤</div>
+                    <div class="service-name">Share Submit</div>
+                </div>
+                <div class="service-item" onclick="showToast('💳 Bind Bank Card - Coming Soon')">
+                    <div class="service-icon">💳</div>
+                    <div class="service-name">Bind bank card</div>
+                </div>
+                <div class="service-item" onclick="showToast('🔑 Change Password - Coming Soon')">
+                    <div class="service-icon">🔑</div>
+                    <div class="service-name">Change Pwd</div>
+                </div>
+                <div class="service-item" onclick="showToast('🎁 Redeem Gift - Coming Soon')">
+                    <div class="service-icon">🎁</div>
+                    <div class="service-name">Redeem Gift</div>
+                </div>
+            </div>
+
+            <button class="buy-btn" onclick="logout()" style="margin: 20px;">🚪 Sign Out</button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" onclick="switchTab('product')">
+                <div class="nav-icon">⚡</div>
+                <div class="nav-label">Product</div>
+            </div>
+            <div class="nav-item" onclick="switchTab('team')">
+                <div class="nav-icon">👥</div>
+                <div class="nav-label">Team</div>
+            </div>
+            <div class="nav-item" onclick="switchTab('mine')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Mine</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 style="margin-bottom: 15px;">💳 Complete Payment</h3>
+            <div class="payment-info">
+                <div><strong>Amount:</strong> RWF <span id="paymentAmount">0</span></div>
+                <div><strong>MTN Account:</strong> 0794363270</div>
+                <div><strong>Account Name:</strong> Acquos Payments</div>
+                <div><strong>USSD:</strong> *182*1*1*0794363270*<span id="ussdAmount">0</span>#</div>
+            </div>
+            <button class="buy-btn" onclick="confirmPayment()">✅ I Have Paid</button>
+            <button class="buy-btn" style="background: #666; margin-top: 10px;" onclick="checkPayment()">🔄 Check Status</button>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let users = JSON.parse(localStorage.getItem('acquos_users') || '[]');
+        let transactions = JSON.parse(localStorage.getItem('acquos_transactions') || '[]');
+        let userProducts = JSON.parse(localStorage.getItem('acquos_user_products') || '[]');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function showRegister() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+        }
+
+        function register() {
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const inviteCode = document.getElementById('inviteCode').value.trim();
+
+            if (!phone || !password) {
+                showToast('Please fill all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters');
+                return;
+            }
+
+            if (users.find(u => u.phone === phone)) {
+                showToast('User already exists');
+                return;
+            }
+
+            const userInviteCode = phone.slice(-6) + Math.random().toString(36).substring(2, 6).toUpperCase();
+            
+            let invitedBy = null;
+            if (inviteCode) {
+                const referrer = users.find(u => u.invite_code === inviteCode);
+                if (referrer) invitedBy = referrer.id;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                phone,
+                password,
+                invite_code: userInviteCode,
+                invited_by: invitedBy,
+                balance: 0,
+                cumulative_income: 0,
+                created_at: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('acquos_users', JSON.stringify(users));
+
+            showToast('Registration successful! Please login.');
+            closeRegisterModal();
+            document.getElementById('phone').value = phone;
+            document.getElementById('password').value = '';
+        }
+
+        function login() {
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!phone || !password) {
+                showToast('Please enter phone and password');
+                return;
+            }
+
+            const user = users.find(u => u.phone === phone && u.password === password);
+            if (!user) {
+                showToast('Invalid phone or password');
+                return;
+            }
+
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+
+            updateUI();
+            processDailyIncome();
+            loadTeamData();
+            loadTransactions();
+            updateDashboardStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            // Show login page again
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('phone').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function updateUI() {
+            if (!currentUser) return;
+            
+            document.getElementById('userPhone').textContent = currentUser.phone.slice(-8);
+            document.getElementById('balance').textContent = `RWF ${currentUser.balance.toLocaleString()}`;
+            document.getElementById('cumulativeIncome').textContent = `RWF ${currentUser.cumulative_income.toLocaleString()}`;
+            document.getElementById('availableBalance').textContent = `RWF ${currentUser.balance.toLocaleString()}`;
+            
+            document.getElementById('profilePhone').textContent = currentUser.phone;
+            document.getElementById('profileInviteCode').textContent = currentUser.invite_code;
+            document.getElementById('profileJoined').textContent = new Date(currentUser.created_at).toLocaleDateString();
+            
+            const baseUrl = window.location.origin;
+            document.getElementById('inviteCodeDisplay').textContent = currentUser.invite_code;
+            document.getElementById('inviteLink').textContent = `${baseUrl}?ref=${currentUser.invite_code}`;
+        }
+
+        function updateDashboardStats() {
+            if (!currentUser) return;
+            
+            const myProducts = userProducts.filter(p => p.user_id === currentUser.id);
+            document.getElementById('activeInvestments').textContent = myProducts.length;
+            
+            const teamCount = users.filter(u => u.invited_by === currentUser.id).length;
+            document.getElementById('teamCount').textContent = teamCount;
+            
+            const today = new Date().toDateString();
+            const todayTransactions = transactions.filter(t => 
+                t.user_id === currentUser.id && 
+                new Date(t.created_at).toDateString() === today &&
+                (t.type === 'checkin' || t.type === 'commission')
+            );
+            const todayTotal = todayTransactions.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('todayIncome').textContent = `RWF ${todayTotal.toLocaleString()}`;
+        }
+
+        function buyProduct(productName, price, dailyIncome) {
+            if (!currentUser) {
+                showToast('Please login first');
+                return;
+            }
+
+            if (currentUser.balance < price) {
+                showToast(`Insufficient balance! Need RWF ${price.toLocaleString()}`);
+                showPage('recharge');
+                return;
+            }
+
+            if (confirm(`Purchase ${productName} for RWF ${price.toLocaleString()}? You will earn RWF ${dailyIncome.toLocaleString()} daily for 150 days.`)) {
+                currentUser.balance -= price;
+                
+                const transaction = {
+                    id: Date.now(),
+                    user_id: currentUser.id,
+                    type: 'purchase',
+                    amount: price,
+                    status: 'completed',
+                    product: productName,
+                    created_at: new Date().toISOString()
+                };
+                transactions.push(transaction);
+                
+                userProducts.push({
+                    id: Date.now(),
+                    user_id: currentUser.id,
+                    product_name: productName,
+                    price: price,
+                    daily_income: dailyIncome,
+                    purchased_at: new Date().toISOString()
+                });
+                
+                localStorage.setItem('acquos_users', JSON.stringify(users.map(u => u.id === currentUser.id ? currentUser : u)));
+                localStorage.setItem('acquos_transactions', JSON.stringify(transactions));
+                localStorage.setItem('acquos_user_products', JSON.stringify(userProducts));
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Handle referral commission
+                if (currentUser.invited_by) {
+                    const referrer = users.find(u => u.id === currentUser.invited_by);
+                    if (referrer) {
+                        const commission = price * 0.36;
+                        referrer.balance += commission;
+                        referrer.cumulative_income += commission;
+                        
+                        const commissionTrans = {
+                            id: Date.now(),
+                            user_id: referrer.id,
+                            type: 'commission',
+                            amount: commission,
+                            status: 'completed',
+                            level: 1,
+                            created_at: new Date().toISOString()
+                        };
+                        transactions.push(commissionTrans);
+                        
+                        showToast(`🎉 Your referrer earned ${commission.toLocaleString()} RWF commission!`);
+                        
+                        users = users.map(u => u.id === referrer.id ? referrer : u);
+                        localStorage.setItem('acquos_users', JSON.stringify(users));
+                    }
+                }
+                
+                updateUI();
+                loadTransactions();
+                updateDashboardStats();
+                showToast(`✅ Successfully purchased ${productName}! Daily earnings will be added.`);
+            }
+        }
+
+        function setAmount(amount) {
+            document.getElementById('rechargeAmount').value = amount;
+        }
+
+        let pendingAmount = null;
+
+        function proceedToPayment() {
+            const amount = parseInt(document.getElementById('rechargeAmount').value);
+            if (!amount || amount < 1000) {
+                showToast('Please enter a valid amount (min 1,000 RWF)');
+                return;
+            }
+            
+            pendingAmount = amount;
+            document.getElementById('paymentAmount').textContent = amount.toLocaleString();
+            document.getElementById('ussdAmount').textContent = amount;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            pendingAmount = null;
+        }
+
+        function confirmPayment() {
+            if (!pendingAmount) return;
+            
+            currentUser.balance += pendingAmount;
+            
+            const transaction = {
+                id: Date.now(),
+                user_id: currentUser.id,
+                type: 'recharge',
+                amount: pendingAmount,
+                status: 'completed',
+                created_at: new Date().toISOString()
+            };
+            transactions.push(transaction);
+            
+            localStorage.setItem('acquos_users', JSON.stringify(users.map(u => u.id === currentUser.id ? currentUser : u)));
+            localStorage.setItem('acquos_transactions', JSON.stringify(transactions));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            updateUI();
+            loadTransactions();
+            updateDashboardStats();
+            showToast(`✅ Recharge of RWF ${pendingAmount.toLocaleString()} successful!`);
+            closeModal();
+            document.getElementById('rechargeAmount').value = '';
+            showPage('product');
+        }
+
+        function checkPayment() {
+            showToast('Checking payment status... Please wait');
+            setTimeout(() => {
+                showToast('Payment not yet confirmed. Please try again in 2-3 minutes.');
+            }, 2000);
+        }
+
+        function withdraw() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            
+            if (!amount || amount < 1000) {
+                showToast('Minimum withdrawal is 1,000 RWF');
+                return;
+            }
+            
+            if (amount > currentUser.balance) {
+                showToast('Insufficient balance');
+                return;
+            }
+            
+            currentUser.balance -= amount;
+            
+            const transaction = {
+                id: Date.now(),
+                user_id: currentUser.id,
+                type: 'withdraw',
+                amount: amount,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            };
+            transactions.push(transaction);
+            
+            localStorage.setItem('acquos_users', JSON.stringify(users.map(u => u.id === currentUser.id ? currentUser : u)));
+            localStorage.setItem('acquos_transactions', JSON.stringify(transactions));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            updateUI();
+            loadTransactions();
+            updateDashboardStats();
+            showToast(`✅ Withdrawal request submitted! Will be processed within 24 hours.`);
+            document.getElementById('withdrawAmount').value = '';
+        }
+
+        function checkIn() {
+            if (!currentUser) return;
+            
+            const today = new Date().toDateString();
+            const lastCheckin = localStorage.getItem(`checkin_${currentUser.id}`);
+            
+            if (lastCheckin === today) {
+                showToast('Already checked in today! Come back tomorrow.');
+                return;
+            }
+            
+            const bonus = 500;
+            currentUser.balance += bonus;
+            currentUser.cumulative_income += bonus;
+            
+            const transaction = {
+                id: Date.now(),
+                user_id: currentUser.id,
+                type: 'checkin',
+                amount: bonus,
+                status: 'completed',
+                created_at: new Date().toISOString()
+            };
+            transactions.push(transaction);
+            
+            localStorage.setItem(`checkin_${currentUser.id}`, today);
+            localStorage.setItem('acquos_users', JSON.stringify(users.map(u => u.id === currentUser.id ? currentUser : u)));
+            localStorage.setItem('acquos_transactions', JSON.stringify(transactions));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            updateUI();
+            loadTransactions();
+            updateDashboardStats();
+            showToast(`✅ Check-in successful! +${bonus} RWF`);
+        }
+
+        function loadTransactions() {
+            if (!currentUser) return;
+            
+            const userTransactions = transactions.filter(t => t.user_id === currentUser.id);
+            
+            if (userTransactions.length === 0) {
+                document.getElementById('recordsList').innerHTML = '<div class="no-data">No transactions yet</div>';
+                return;
+            }
+            
+            const recordsHtml = userTransactions.slice(0, 20).map(t => `
+                <div class="product-card" style="background: white; margin: 10px 20px; padding: 15px;">
+                    <div class="product-info-row">
+                        <span>${t.type === 'recharge' ? '💰' : t.type === 'withdraw' ? '💸' : t.type === 'purchase' ? '⚡' : '✅'} ${t.type.toUpperCase()}</span>
+                        <span style="color: ${t.type === 'withdraw' ? '#ef4444' : '#10b981'}; font-weight: bold;">${t.type === 'withdraw' ? '-' : '+'} RWF ${t.amount.toLocaleString()}</span>
+                    </div>
+                    ${t.product ? `<div style="font-size: 12px; color: #666;">${t.product}</div>` : ''}
+                    <div style="font-size: 11px; color: #666; margin-top: 8px;">${new Date(t.created_at).toLocaleString()}</div>
+                    <div style="font-size: 11px;">Status: <span style="color: ${t.status === 'completed' ? '#10b981' : '#f59e0b'}">${t.status}</span></div>
+                </div>
+            `).join('');
+            
+            document.getElementById('recordsList').innerHTML = recordsHtml;
+        }
+
+        function loadTeamData() {
+            if (!currentUser) return;
+            
+            const level1 = users.filter(u => u.invited_by === currentUser.id);
+            const level1Ids = level1.map(u => u.id);
+            const level2 = users.filter(u => level1Ids.includes(u.invited_by));
+            const level2Ids = level2.map(u => u.id);
+            const level3 = users.filter(u => level2Ids.includes(u.invited_by));
+            
+            document.getElementById('lv1Users').textContent = `${level1.length} users`;
+            document.getElementById('lv2Users').textContent = `${level2.length} users`;
+            document.getElementById('lv3Users').textContent = `${level3.length} users`;
+        }
+
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active-page');
+            });
+            document.getElementById(pageName + 'Page').classList.add('active-page');
+            
+            if (pageName === 'team') loadTeamData();
+            if (pageName === 'records') loadTransactions();
+            if (pageName === 'home') updateDashboardStats();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            showPage(tab);
+        }
+
+        function copyCode() {
+            if (currentUser) {
+                navigator.clipboard.writeText(currentUser.invite_code);
+                showToast('Invite code copied!');
+            }
+        }
+
+        function copyLink() {
+            if (currentUser) {
+                const link = `${window.location.origin}?ref=${currentUser.invite_code}`;
+                navigator.clipboard.writeText(link);
+                showToast('Invite link copied!');
+            }
+        }
+
+        // Check if user is already logged in
+        if (currentUser) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            updateUI();
+            loadTeamData();
+            loadTransactions();
+            updateDashboardStats();
+        } else {
+            // Make sure login page is visible
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+        }
+
+        // Create demo user if no users exist
+        if (users.length === 0) {
+            const demoUser = {
+                id: 1,
+                phone: '250790063222',
+                password: '123456',
+                invite_code: 'ACQ2024',
+                invited_by: null,
+                balance: 5000,
+                cumulative_income: 3000,
+                created_at: new Date().toISOString()
+            };
+            users.push(demoUser);
+            localStorage.setItem('acquos_users', JSON.stringify(users));
+        }
+
+        // Check URL for referral code
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode && !currentUser) {
+            setTimeout(() => {
+                document.getElementById('inviteCode').value = refCode;
+                showRegister();
+            }, 500);
+        }
+        // ========== DAILY INCOME SYSTEM ==========
+// Add this function to process daily earnings from purchased products
+
+function processDailyIncome() {
+    if (!currentUser) return;
+    
+    const today = new Date().toDateString();
+    const lastIncomeDate = localStorage.getItem(`last_income_${currentUser.id}`);
+    
+    if (lastIncomeDate === today) {
+        console.log('Daily income already processed today');
+        return;
+    }
+    
+    // Get user's active products/investments
+    const myProducts = userProducts.filter(p => p.user_id === currentUser.id);
+    
+    if (myProducts.length === 0) {
+        localStorage.setItem(`last_income_${currentUser.id}`, today);
+        return;
+    }
+    
+    let totalDailyIncome = 0;
+    
+    myProducts.forEach(product => {
+        // Each product has daily_income property
+        totalDailyIncome += product.daily_income || 0;
+    });
+    
+    if (totalDailyIncome > 0) {
+        // Add earnings to user balance
+        currentUser.balance += totalDailyIncome;
+        currentUser.cumulative_income += totalDailyIncome;
+        
+        // Record as transaction
+        const incomeTransaction = {
+            id: Date.now(),
+            user_id: currentUser.id,
+            type: 'daily_income',
+            amount: totalDailyIncome,
+            status: 'completed',
+            product_count: myProducts.length,
+            created_at: new Date().toISOString()
+        };
+        transactions.push(incomeTransaction);
+        
+        // Save all data
+        localStorage.setItem('acquos_users', JSON.stringify(users.map(u => u.id === currentUser.id ? currentUser : u)));
+        localStorage.setItem('acquos_transactions', JSON.stringify(transactions));
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        // Show notification
+        showToast(`📈 Daily earnings: +${totalDailyIncome.toLocaleString()} RWF from ${myProducts.length} investments!`);
+        
+        // Update UI
+        updateUI();
+        loadTransactions();
+        updateDashboardStats();
+    }
+    
+    // Mark as processed for today
+    localStorage.setItem(`last_income_${currentUser.id}`, today);
+}
+
+// Call this when user logs in and when app loads
+// Add this line inside your login() function after updateUI():
+// processDailyIncome();
+
+// Also call it when page loads if user is logged in
+    </script>
+</body>
+</html>
